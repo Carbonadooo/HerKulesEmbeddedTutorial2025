@@ -27,9 +27,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "bsp_can.h"
-#include <stdio.h>
 #include "remote_control.h"
+#include "bsp_can.h"
+#include "bsp_dwt.h"
+#include "BMI088driver.h"
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -116,6 +118,9 @@ int main(void)
   /* USER CODE BEGIN 2 */
   can_filter_init();
   remote_control_init();
+  // BMI088 init
+  DWT_Init(168);
+  while (BMI088_init(&hspi1, 1) != BMI088_NO_ERROR);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
