@@ -1,4 +1,4 @@
 .vscode
 **/MDK-ARM/**
-!Robot.uvprojx
+!*.uvprojx
 !startup_stm32f407xx.s
