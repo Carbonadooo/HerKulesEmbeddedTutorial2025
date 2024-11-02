@@ -8,11 +8,14 @@
 #include "bsp_can.h"
 
 // Parameters
+#define PI 3.14159265359f
 #define WHEEL_DIAMETER 0.1525f
 #define REDUCTION_RATIO 19.203f
 #define MOTOR_RPM_TO_LINEAR_VELOCITY (2*PI/60)*(WHEEL_DIAMETER/2)/REDUCTION_RATIO
 #define K MOTOR_RPM_TO_LINEAR_VELOCITY
 #define ROTATE_RADIUS 0.27f
+#define RC_RANGE 660.0f
+#define sqrt2 1.41421356237f
 
 // PID
 #define WHEEL_VELOCITY_PID_MAX_OUT 15000.0f
@@ -28,9 +31,13 @@ extern motor_measure_t chassis_motor_measure[4];
 
 // RC control
 const RC_ctrl_t *rc_ctrl_chassis;
+fp32 chassis_sensitivity = 0.001f;
 
 // Variable
 fp32 vx, vy, wz;
+
+// Magic number
+fp32 rotate_speed = 0.2f;
 
 void Chassis_Init(void)
 {
@@ -47,7 +54,11 @@ void Chassis_Init(void)
 // Set chassis mode according to remote control input
 void Chassis_Mode_Set(void)
 {
-    if (switch_is_down(rc_ctrl_chassis->rc.s[0])) *chassis_mode = Chassis_No_Force;
+    if (switch_is_down(rc_ctrl_chassis->rc.s[0]))
+    {
+        *chassis_mode = Chassis_No_Force;
+        return;
+    }    
     switch (*chassis_mode)
     {
     case Chassis_No_Force:
@@ -67,18 +78,51 @@ void Chassis_Mode_Set(void)
 // Update chassis data
 void Chassis_Data_Update(void)
 {
-    
+    for (int i = 0; i < 4; i++)
+    {
+        wheel[i].velocity = chassis_motor_measure[i].speed_rpm * K; // rad / s
+    }
 }
 
 // Get motor current
 void Chassis_Control(void)
 {
-    // Get target chassis velocity
-
-    // Calculate each target motor velocity
-
-    // Calculate each motor current using PID
-
+    switch (*chassis_mode)
+    {
+        case Chassis_No_Force:
+            for (int i = 0; i < 4; i++)
+            {
+                wheel[i].give_current = 0;
+            }
+        break;
+        case Chassis_Normal:
+            // Get target chassis velocity
+            chassis_control.chassis_v_x = rc_ctrl_chassis->rc.ch[1] / RC_RANGE;
+            chassis_control.chassis_v_y = - rc_ctrl_chassis->rc.ch[0] / RC_RANGE;
+            chassis_control.chassis_v_rotate = - rc_ctrl_chassis->rc.ch[2] / RC_RANGE;
+            // Calculate each target motor velocity
+            wheel[0].target_velocity = 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            wheel[1].target_velocity = - 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            wheel[2].target_velocity = - 2 * chassis_control.chassis_v_x - 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            wheel[3].target_velocity = 2 * chassis_control.chassis_v_x - 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            // Calculate each motor current using PID
+            for (int i = 0; i < 4; i++)
+            {
+                wheel[i].give_current = PID_calc(&wheel_velocity_pid[i], wheel[i].velocity, wheel[i].target_velocity);
+            }
+        break;
+        case Chassis_Rotate:
+            chassis_control.chassis_v_rotate = rotate_speed;
+            wheel[0].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            wheel[1].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            wheel[2].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            wheel[3].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            for (int i = 0; i < 4; i++)
+            {
+                wheel[i].give_current = PID_calc(&wheel_velocity_pid[i], wheel[i].velocity, wheel[i].target_velocity);
+            }
+        break;
+    }
 }
 
 void Chassis_Task(void const * argument)

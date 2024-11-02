@@ -11,6 +11,7 @@ enum Chassis_Mode
 
 typedef struct
 {
+  // rad/s
   fp32 velocity;
   fp32 target_velocity;
   int16_t give_current;
