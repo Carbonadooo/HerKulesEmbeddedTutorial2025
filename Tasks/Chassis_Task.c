@@ -24,9 +24,13 @@ pid_type_def wheel_velocity_pid[4];
 chassis_control_t chassis_control;
 chassis_motor_t *wheel;
 enum Chassis_Mode *chassis_mode;
+extern motor_measure_t chassis_motor_measure[4];
 
 // RC control
 const RC_ctrl_t *rc_ctrl_chassis;
+
+// Variable
+fp32 vx, vy, wz;
 
 void Chassis_Init(void)
 {
@@ -63,7 +67,7 @@ void Chassis_Mode_Set(void)
 // Update chassis data
 void Chassis_Data_Update(void)
 {
-
+    
 }
 
 // Get motor current
@@ -77,7 +81,6 @@ void Chassis_Control(void)
 
 }
 
-extern motor_measure_t chassis_motor_measure[4];
 void Chassis_Task(void const * argument)
 {
     Chassis_Init();
