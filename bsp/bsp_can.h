@@ -13,8 +13,8 @@ typedef struct
 } motor_measure_t;
 
 extern void can_filter_init(void);
-extern void CAN_cmd_6020(int16_t yaw_current, int16_t pitch_current);
-extern void CAN_cmd_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3_current, int16_t motor4_current);
+extern void CAN_CMD_6020(int16_t yaw_current, int16_t pitch_current);
+extern void CAN_CMD_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3_current, int16_t motor4_current);
 extern motor_measure_t gimbal_motor_measure[2];
 extern motor_measure_t chassis_motor_measure[4];
 

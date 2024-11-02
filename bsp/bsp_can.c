@@ -80,7 +80,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     }
 }
 
-void CAN_cmd_6020(int16_t yaw_current, int16_t pitch_current)
+void CAN_CMD_6020(int16_t yaw_current, int16_t pitch_current)
 {
     CAN_TxHeaderTypeDef  gimbal_tx_message;
     uint8_t gimbal_can_send_data[8];
@@ -100,7 +100,7 @@ void CAN_cmd_6020(int16_t yaw_current, int16_t pitch_current)
     HAL_CAN_AddTxMessage(&hcan1, &gimbal_tx_message, gimbal_can_send_data, &send_mail_box);
 }
 
-void CAN_cmd_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3_current, int16_t motor4_current)
+void CAN_CMD_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3_current, int16_t motor4_current)
 {
     CAN_TxHeaderTypeDef  chassis_tx_message;
     uint8_t chassis_can_send_data[8];

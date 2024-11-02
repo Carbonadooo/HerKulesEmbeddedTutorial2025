@@ -189,7 +189,7 @@ void MotorTask(void const * argument)
         mode_set();
         data_update();
         control();
-        CAN_cmd_6020(yaw->give_current, pitch->give_current);
+        CAN_CMD_6020(yaw->give_current, pitch->give_current);
         osDelay(1); // freq > 300Hz
     }
     
