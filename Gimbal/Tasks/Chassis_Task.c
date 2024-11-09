@@ -90,10 +90,10 @@ void Chassis_Control(void)
     switch (*chassis_mode)
     {
         case Chassis_No_Force:
-            for (int i = 0; i < 4; i++)
-            {
-                wheel[i].give_current = 0;
-            }
+            // for (int i = 0; i < 4; i++)
+            // {
+            //     wheel[i].give_current = 0;
+            // }
         break;
         case Chassis_Normal:
             // Get target chassis velocity
@@ -101,40 +101,46 @@ void Chassis_Control(void)
             chassis_control.chassis_v_y = - rc_ctrl_chassis->rc.ch[0] / RC_RANGE;
             chassis_control.chassis_v_rotate = - rc_ctrl_chassis->rc.ch[2] / RC_RANGE;
             // Calculate each target motor velocity
-            wheel[0].target_velocity = 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
-            wheel[1].target_velocity = - 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
-            wheel[2].target_velocity = - 2 * chassis_control.chassis_v_x - 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
-            wheel[3].target_velocity = 2 * chassis_control.chassis_v_x - 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            // wheel[0].target_velocity = 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            // wheel[1].target_velocity = - 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            // wheel[2].target_velocity = - 2 * chassis_control.chassis_v_x - 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
+            // wheel[3].target_velocity = 2 * chassis_control.chassis_v_x - 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
             // Calculate each motor current using PID
-            for (int i = 0; i < 4; i++)
-            {
-                wheel[i].give_current = PID_calc(&wheel_velocity_pid[i], wheel[i].velocity, wheel[i].target_velocity);
-            }
+            // for (int i = 0; i < 4; i++)
+            // {
+            //     wheel[i].give_current = PID_calc(&wheel_velocity_pid[i], wheel[i].velocity, wheel[i].target_velocity);
+            // }
         break;
         case Chassis_Rotate:
             chassis_control.chassis_v_rotate = rotate_speed;
-            wheel[0].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
-            wheel[1].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
-            wheel[2].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
-            wheel[3].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
-            for (int i = 0; i < 4; i++)
-            {
-                wheel[i].give_current = PID_calc(&wheel_velocity_pid[i], wheel[i].velocity, wheel[i].target_velocity);
-            }
+            // wheel[0].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            // wheel[1].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            // wheel[2].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            // wheel[3].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
+            // for (int i = 0; i < 4; i++)
+            // {
+            //     wheel[i].give_current = PID_calc(&wheel_velocity_pid[i], wheel[i].velocity, wheel[i].target_velocity);
+            // }
         break;
     }
 }
-fp32 test_data;
+uint8_t test_data[8];
 
 void Chassis_Task(void const * argument)
 {
     Chassis_Init();
     while(1)
     {
-        // Chassis_Mode_Set();
+        Chassis_Mode_Set();
         // Chassis_Data_Update();
-        // Chassis_Control();
+        Chassis_Control();
         
+        // x velocity, y velocity, rotate velocity, chassis mode
+        memset(test_data, 0, 8);
+        test_data[0] = (chassis_control.chassis_v_x + 1.0f) * 127.5f;
+        test_data[1] = (chassis_control.chassis_v_y + 1.0f) * 127.5f;
+        test_data[2] = (chassis_control.chassis_v_rotate + 1.0f) * 127.5f;
+        test_data[3] = *chassis_mode;
         CAN_GIMBAL_TO_CHASSIS(test_data);
         vTaskDelay(1);
     }

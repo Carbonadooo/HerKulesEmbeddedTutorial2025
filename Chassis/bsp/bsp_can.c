@@ -48,6 +48,7 @@ uint8_t rx_data[8];
 motor_measure_t gimbal_motor_measure[2];
 motor_measure_t chassis_motor_measure[4];
 extern fp32 test_data;
+uint8_t gimbal_to_chassis_data[8];
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
@@ -95,7 +96,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
             case 0x130:
             {
                 // send: memcpy(data, &tx_data, sizeof(tx_data));
-                memcpy(&test_data, rx_data, sizeof(test_data));
+                memcpy(&gimbal_to_chassis_data, rx_data, sizeof(gimbal_to_chassis_data));
                 break;
             }
             default:

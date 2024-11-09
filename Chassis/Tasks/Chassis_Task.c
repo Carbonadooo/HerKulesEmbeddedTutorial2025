@@ -41,6 +41,7 @@ fp32 rotate_speed = 0.2f;
 
 // Test data
 fp32 test_data;
+extern uint8_t gimbal_to_chassis_data[8];
 
 void Chassis_Init(void)
 {
@@ -57,30 +58,17 @@ void Chassis_Init(void)
 // Set chassis mode according to remote control input
 void Chassis_Mode_Set(void)
 {
-    if (switch_is_down(rc_ctrl_chassis->rc.s[0]))
-    {
-        *chassis_mode = Chassis_No_Force;
-        return;
-    }    
-    switch (*chassis_mode)
-    {
-    case Chassis_No_Force:
-        if (switch_is_mid(rc_ctrl_chassis->rc.s[0])) *chassis_mode = Chassis_Normal;
-        break;
-    case Chassis_Normal:
-        if (switch_is_up(rc_ctrl_chassis->rc.s[0])) *chassis_mode = Chassis_Rotate;
-        break;
-    case Chassis_Rotate:
-        if (switch_is_mid(rc_ctrl_chassis->rc.s[0])) *chassis_mode = Chassis_Normal;
-        break;
-    default:
-        break;
-    }
+    return;
 }
 
 // Update chassis data
 void Chassis_Data_Update(void)
 {
+    chassis_control.chassis_v_x = gimbal_to_chassis_data[0] / 127.5f - 1.0f;
+    chassis_control.chassis_v_y = gimbal_to_chassis_data[1] / 127.5f - 1.0f;
+    chassis_control.chassis_v_rotate = gimbal_to_chassis_data[2] / 127.5f - 1.0f;
+    chassis_control.mode = gimbal_to_chassis_data[3];
+    
     for (int i = 0; i < 4; i++)
     {
         wheel[i].velocity = chassis_motor_measure[i].speed_rpm * K; // rad / s
@@ -99,11 +87,6 @@ void Chassis_Control(void)
             }
         break;
         case Chassis_Normal:
-            // Get target chassis velocity
-            // chassis_control.chassis_v_x = rc_ctrl_chassis->rc.ch[1] / RC_RANGE;
-            // chassis_control.chassis_v_y = - rc_ctrl_chassis->rc.ch[0] / RC_RANGE;
-            // chassis_control.chassis_v_rotate = - rc_ctrl_chassis->rc.ch[2] / RC_RANGE;
-
             // Calculate each target motor velocity
             wheel[0].target_velocity = 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
             wheel[1].target_velocity = - 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
@@ -116,8 +99,6 @@ void Chassis_Control(void)
             }
         break;
         case Chassis_Rotate:
-            // chassis_control.chassis_v_rotate = rotate_speed;
-            
             wheel[0].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
             wheel[1].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
             wheel[2].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;

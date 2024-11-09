@@ -126,7 +126,7 @@ void CAN_CMD_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3
     HAL_CAN_AddTxMessage(&hcan1, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }
 
-void CAN_GIMBAL_TO_CHASSIS(fp32 tx_data)
+void CAN_GIMBAL_TO_CHASSIS(uint8_t *tx_data)
 {
     CAN_TxHeaderTypeDef  msg;
     uint8_t data[8];
@@ -136,10 +136,6 @@ void CAN_GIMBAL_TO_CHASSIS(fp32 tx_data)
     msg.RTR = CAN_RTR_DATA;
     msg.DLC = 0x08;
     
-    memcpy(data, &tx_data, sizeof(tx_data));
-    data[4] = 0;
-    data[5] = 0;
-    data[6] = 0;
-    data[7] = 0;
+    memcpy(data, &tx_data, 8);
     HAL_CAN_AddTxMessage(&hcan2, &msg, data, &send_mail_box); 
 }
