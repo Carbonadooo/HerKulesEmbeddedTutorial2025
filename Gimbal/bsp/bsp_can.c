@@ -52,6 +52,11 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     switch (rx_header.StdId)
     {
+        case 0x130:
+        {
+            // data transfer
+            break;
+        }
         case 0x205:
         {
             // Gimbal Yaw 6020
@@ -118,4 +123,26 @@ void CAN_CMD_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3
     chassis_can_send_data[6] = (motor4_current >> 8);
     chassis_can_send_data[7] = motor4_current;
     HAL_CAN_AddTxMessage(&hcan1, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
+}
+
+void CAN_CMD_COMM(int8_t tx_data[8])
+{
+    CAN_TxHeaderTypeDef  comm_tx_message;
+    uint8_t comm_can_send_data[8];
+    uint32_t send_mail_box;
+    comm_tx_message.StdId = 0x130;
+    comm_tx_message.IDE = CAN_ID_STD;
+    comm_tx_message.RTR = CAN_RTR_DATA;
+    comm_tx_message.DLC = 0x08;
+   
+    comm_can_send_data[0] = tx_data[0];
+    comm_can_send_data[1] = tx_data[1];
+    comm_can_send_data[2] = tx_data[2];
+    comm_can_send_data[3] = tx_data[3];
+    comm_can_send_data[4] = tx_data[4];
+    comm_can_send_data[5] = tx_data[5];
+    comm_can_send_data[6] = tx_data[6];
+    comm_can_send_data[7] = tx_data[7];
+    
+    HAL_CAN_AddTxMessage(&hcan2, &comm_tx_message, comm_can_send_data, &send_mail_box);
 }
