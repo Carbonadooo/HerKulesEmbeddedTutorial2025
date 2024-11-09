@@ -39,6 +39,9 @@ fp32 vx, vy, wz;
 // Magic number
 fp32 rotate_speed = 0.2f;
 
+// Test data
+fp32 test_data;
+
 void Chassis_Init(void)
 {
     memset(&chassis_control,0,sizeof(chassis_control_t));

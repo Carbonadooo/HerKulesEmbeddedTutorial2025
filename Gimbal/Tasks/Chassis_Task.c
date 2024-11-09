@@ -124,16 +124,18 @@ void Chassis_Control(void)
         break;
     }
 }
+fp32 test_data;
 
 void Chassis_Task(void const * argument)
 {
     Chassis_Init();
     while(1)
     {
-        Chassis_Mode_Set();
-        Chassis_Data_Update();
-        Chassis_Control();
-        CAN_CMD_3508(wheel[0].give_current, wheel[1].give_current, wheel[2].give_current, wheel[3].give_current);
+        // Chassis_Mode_Set();
+        // Chassis_Data_Update();
+        // Chassis_Control();
+        
+        CAN_GIMBAL_TO_CHASSIS(test_data);
         vTaskDelay(1);
     }
 }

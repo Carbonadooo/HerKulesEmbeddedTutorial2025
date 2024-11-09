@@ -1,5 +1,6 @@
 #include "bsp_can.h"
 #include "main.h"
+#include "string.h"
 #define CAN_6020_ALL_ID 0x1FF
 #define CAN_3508_ALL_ID 0x200
 #define get_motor_measure(ptr, data)                                    \
@@ -118,4 +119,23 @@ void CAN_CMD_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3
     chassis_can_send_data[6] = (motor4_current >> 8);
     chassis_can_send_data[7] = motor4_current;
     HAL_CAN_AddTxMessage(&hcan1, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
+}
+
+
+void CAN_GIMBAL_TO_CHASSIS(fp32 tx_data)
+{
+    CAN_TxHeaderTypeDef  msg;
+    uint8_t data[8];
+    uint32_t send_mail_box;
+    msg.StdId = 0x130;
+    msg.IDE = CAN_ID_STD;
+    msg.RTR = CAN_RTR_DATA;
+    msg.DLC = 0x08;
+    
+    memcpy(data, &tx_data, sizeof(tx_data));
+    data[4] = 0;
+    data[5] = 0;
+    data[6] = 0;
+    data[7] = 0;
+    HAL_CAN_AddTxMessage(&hcan2, &msg, data, &send_mail_box); 
 }

@@ -30,4 +30,6 @@ typedef struct
 
 void Chassis_Task(void const *argument);
 
+extern fp32 test_data;
+
 #endif

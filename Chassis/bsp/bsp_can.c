@@ -1,5 +1,7 @@
 #include "bsp_can.h"
 #include "main.h"
+#include "Chassis_Task.h"
+#include <string.h>
 #define CAN_6020_ALL_ID 0x1FF
 #define CAN_3508_ALL_ID 0x200
 #define get_motor_measure(ptr, data)                                    \
@@ -43,6 +45,7 @@ void can_filter_init(void)
 uint8_t rx_data[8];
 motor_measure_t gimbal_motor_measure[2];
 motor_measure_t chassis_motor_measure[4];
+extern fp32 test_data;
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
@@ -50,32 +53,53 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 
-    switch (rx_header.StdId)
+    if (hcan == &hcan1)
     {
-        case 0x205:
+        switch (rx_header.StdId)
         {
-            // Gimbal Yaw 6020
-            get_motor_measure(&gimbal_motor_measure[0], rx_data);
-            break;
+            case 0x205:
+            {
+                // Gimbal Yaw 6020
+                get_motor_measure(&gimbal_motor_measure[0], rx_data);
+                break;
+            }
+            case 0x206:
+            {
+                // Gimbal Pitch 6020
+                get_motor_measure(&gimbal_motor_measure[1], rx_data);
+                break;
+            }
+            case 0x201:
+            case 0x202:
+            case 0x203:
+            case 0x204:
+            {
+                // Chassis 3508
+                get_motor_measure(&chassis_motor_measure[rx_header.StdId - 0x201], rx_data);
+                break;
+            }
+            default:
+            {
+                break;
+            }
         }
-        case 0x206:
+
+    }
+
+    if (hcan == &hcan2)
+    {
+        switch (rx_header.StdId)
         {
-            // Gimbal Pitch 6020
-            get_motor_measure(&gimbal_motor_measure[1], rx_data);
-            break;
-        }
-        case 0x201:
-        case 0x202:
-        case 0x203:
-        case 0x204:
-        {
-            // Chassis 3508
-            get_motor_measure(&chassis_motor_measure[rx_header.StdId - 0x201], rx_data);
-            break;
-        }
-        default:
-        {
-            break;
+            case 0x130:
+            {
+                // send: memcpy(data, &tx_data, sizeof(tx_data));
+                memcpy(&test_data, rx_data, sizeof(test_data));
+                break;
+            }
+            default:
+            {
+                break;
+            }
         }
     }
 }
