@@ -49,6 +49,7 @@ motor_measure_t gimbal_motor_measure[2];
 motor_measure_t chassis_motor_measure[4];
 extern fp32 test_data;
 uint8_t gimbal_to_chassis_data[8];
+int debugcan2 = 0, debugcan1 = 0;
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
@@ -58,8 +59,15 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     if (hcan == &hcan1)
     {
+        debugcan1 ++;
         switch (rx_header.StdId)
         {
+            case 0x130:
+            {
+                // send: memcpy(data, &tx_data, sizeof(tx_data));
+                memcpy(gimbal_to_chassis_data, rx_data, sizeof(gimbal_to_chassis_data));
+                break;
+            }
             case 0x205:
             {
                 // Gimbal Yaw 6020
@@ -91,12 +99,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     if (hcan == &hcan2)
     {
+        debugcan2 ++;
         switch (rx_header.StdId)
         {
             case 0x130:
             {
                 // send: memcpy(data, &tx_data, sizeof(tx_data));
-                memcpy(&gimbal_to_chassis_data, rx_data, sizeof(gimbal_to_chassis_data));
+                memcpy(gimbal_to_chassis_data, rx_data, sizeof(gimbal_to_chassis_data));
                 break;
             }
             default:
