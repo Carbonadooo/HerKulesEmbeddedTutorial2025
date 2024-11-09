@@ -53,6 +53,11 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     switch (rx_header.StdId)
     {
+        case 0x130:
+        {
+            // data transfer
+            break;
+        }
         case 0x205:
         {
             // Gimbal Yaw 6020

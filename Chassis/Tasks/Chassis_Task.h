@@ -24,9 +24,13 @@ typedef struct
   fp32 chassis_v_y;
   fp32 chassis_v_rotate;
 
+  fp32 follow_angle;
+
   enum Chassis_Mode mode;
   chassis_motor_t chassis_m3508[4];
 }chassis_control_t;
+
+extern chassis_control_t chassis_control;
 
 void Chassis_Task(void const *argument);
 

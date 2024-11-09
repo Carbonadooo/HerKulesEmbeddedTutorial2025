@@ -100,9 +100,10 @@ void Chassis_Control(void)
         break;
         case Chassis_Normal:
             // Get target chassis velocity
-            chassis_control.chassis_v_x = rc_ctrl_chassis->rc.ch[1] / RC_RANGE;
-            chassis_control.chassis_v_y = - rc_ctrl_chassis->rc.ch[0] / RC_RANGE;
-            chassis_control.chassis_v_rotate = - rc_ctrl_chassis->rc.ch[2] / RC_RANGE;
+            // chassis_control.chassis_v_x = rc_ctrl_chassis->rc.ch[1] / RC_RANGE;
+            // chassis_control.chassis_v_y = - rc_ctrl_chassis->rc.ch[0] / RC_RANGE;
+            // chassis_control.chassis_v_rotate = - rc_ctrl_chassis->rc.ch[2] / RC_RANGE;
+
             // Calculate each target motor velocity
             wheel[0].target_velocity = 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
             wheel[1].target_velocity = - 2 * chassis_control.chassis_v_x + 2 * chassis_control.chassis_v_y - sqrt2 * chassis_control.chassis_v_rotate;
@@ -115,7 +116,8 @@ void Chassis_Control(void)
             }
         break;
         case Chassis_Rotate:
-            chassis_control.chassis_v_rotate = rotate_speed;
+            // chassis_control.chassis_v_rotate = rotate_speed;
+            
             wheel[0].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
             wheel[1].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
             wheel[2].target_velocity = - sqrt2 * chassis_control.chassis_v_rotate;
