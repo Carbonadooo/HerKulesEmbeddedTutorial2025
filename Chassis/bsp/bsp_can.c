@@ -58,19 +58,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
     if (hcan == &hcan1)
     {
         switch (rx_header.StdId)
-        case 0x130:
-        {
-            // data transfer
-            chassis_control.chassis_v_x = (int8_t) (rx_data[0] << 8 | rx_data[1]);
-            chassis_control.chassis_v_y = (int8_t) (rx_data[2] << 8 | rx_data[3]);
-            chassis_control.chassis_v_rotate = (int8_t) (rx_data[4] << 8 | rx_data[5]);
-            chassis_control.mode = rx_data[6];
-            chassis_control.chassis_v_x /= scale;
-            chassis_control.chassis_v_y /= scale;
-            chassis_control.chassis_v_rotate /= scale;
-            break;
-        }
-        case 0x205:
         {
             case 0x205:
             {

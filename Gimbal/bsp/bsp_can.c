@@ -126,7 +126,6 @@ void CAN_CMD_3508(int16_t motor1_current, int16_t motor2_current, int16_t motor3
     HAL_CAN_AddTxMessage(&hcan1, &chassis_tx_message, chassis_can_send_data, &send_mail_box);
 }
 
-
 void CAN_GIMBAL_TO_CHASSIS(fp32 tx_data)
 {
     CAN_TxHeaderTypeDef  msg;
