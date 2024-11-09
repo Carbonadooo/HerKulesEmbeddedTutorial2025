@@ -94,6 +94,9 @@ void Chassis_Control(void)
             // {
             //     wheel[i].give_current = 0;
             // }
+            chassis_control.chassis_v_x      = 0.0f;
+            chassis_control.chassis_v_y      = 0.0f;
+            chassis_control.chassis_v_rotate = 0.0f;
         break;
         case Chassis_Normal:
             // Get target chassis velocity

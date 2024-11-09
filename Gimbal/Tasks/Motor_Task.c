@@ -10,13 +10,13 @@
 
 
 pid_type_def motor_pos_pid;
-const fp32 motor_pos_pid_para[3] = {1.0f, 0.0f, 0.0f};
+const fp32 motor_pos_pid_para[3] = {2.0f, 0.0f, 0.0f};
 fp32 max_out_pos = 20.0f;
 fp32 max_iout_pos = 5.0f;
 
 pid_type_def motor_vel_pid;
 const fp32 motor_vel_pid_para[3] = {100.0f, 0.0f, 0.0f};
-fp32 max_out_vel = 1000.0f;
+fp32 max_out_vel = 2000.0f;
 fp32 max_iout_vel = 0.0f;
 
 //pitch
@@ -110,7 +110,9 @@ void data_update(void)
     yaw->rpm = speed_filter_3;
 
     relative_encoder = gimbal_motor_measure[0].ecd - yaw_init_encoder;
-    yaw->relative_ecd_angle = (fp32)relative_encoder / 8192.0f * 360.0f - 180.0f; // (-180, 180]
+    yaw->relative_ecd_angle = (fp32)relative_encoder / 8192.0f * 360.0f; // (-180, 180]
+    if (yaw->relative_ecd_angle > 180.0f)
+        yaw->relative_ecd_angle -= 360.0f;
 
     static fp32 speed_filter_1_pitch = 0.0f;
     static fp32 speed_filter_2_pitch = 0.0f;
@@ -190,7 +192,7 @@ void MotorTask(void const * argument)
         data_update();
         control();
         CAN_CMD_6020(yaw->give_current, pitch->give_current);
-        osDelay(1); // freq > 300Hz
+        vTaskDelay(1); // freq > 300Hz
     }
     
 }

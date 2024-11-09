@@ -51,37 +51,35 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 
     HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rx_header, rx_data);
 
-    switch (rx_header.StdId)
+    if (hcan == &hcan1)
     {
-        case 0x130:
+        switch (rx_header.StdId)
         {
-            // data transfer
-            break;
-        }
-        case 0x205:
-        {
-            // Gimbal Yaw 6020
-            get_motor_measure(&gimbal_motor_measure[0], rx_data);
-            break;
-        }
-        case 0x206:
-        {
-            // Gimbal Pitch 6020
-            get_motor_measure(&gimbal_motor_measure[1], rx_data);
-            break;
-        }
-        case 0x201:
-        case 0x202:
-        case 0x203:
-        case 0x204:
-        {
-            // Chassis 3508
-            get_motor_measure(&chassis_motor_measure[rx_header.StdId - 0x201], rx_data);
-            break;
-        }
-        default:
-        {
-            break;
+            case 0x205:
+            {
+                // Gimbal Yaw 6020
+                get_motor_measure(&gimbal_motor_measure[0], rx_data);
+                break;
+            }
+            case 0x206:
+            {
+                // Gimbal Pitch 6020
+                get_motor_measure(&gimbal_motor_measure[1], rx_data);
+                break;
+            }
+            case 0x201:
+            case 0x202:
+            case 0x203:
+            case 0x204:
+            {
+                // Chassis 3508
+                get_motor_measure(&chassis_motor_measure[rx_header.StdId - 0x201], rx_data);
+                break;
+            }
+            default:
+            {
+                break;
+            }
         }
     }
 }
