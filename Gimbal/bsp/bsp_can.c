@@ -136,6 +136,6 @@ void CAN_GIMBAL_TO_CHASSIS(uint8_t *tx_data)
     msg.RTR = CAN_RTR_DATA;
     msg.DLC = 0x08;
     
-    memcpy(data, &tx_data, 8);
+    memcpy(data, tx_data, 8);
     HAL_CAN_AddTxMessage(&hcan2, &msg, data, &send_mail_box); 
 }
